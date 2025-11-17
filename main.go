@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,31 +11,43 @@ import (
 	//"os"
 )
 
-// package main
-// 我的皮肤loge
-var Logo = `                  ███  ████  █████                                        █████           
-                 ▒▒▒  ▒▒███ ▒▒███                                        ▒▒███            
- █████████████   ████  ▒███  ▒███ █████  ██████   ██████   ████████    ███████  █████ ████
-▒▒███▒▒███▒▒███ ▒▒███  ▒███  ▒███▒▒███  ███▒▒███ ▒▒▒▒▒███ ▒▒███▒▒███  ███▒▒███ ▒▒███ ▒███ 
- ▒███ ▒███ ▒███  ▒███  ▒███  ▒██████▒  ▒███ ▒▒▒   ███████  ▒███ ▒███ ▒███ ▒███  ▒███ ▒███ 
- ▒███ ▒███ ▒███  ▒███  ▒███  ▒███▒▒███ ▒███  ███ ███▒▒███  ▒███ ▒███ ▒███ ▒███  ▒███ ▒███ 
- █████▒███ █████ █████ █████ ████ █████▒▒██████ ▒▒████████ ████ █████▒▒████████ ▒▒███████ 
-▒▒▒▒▒ ▒▒▒ ▒▒▒▒▒ ▒▒▒▒▒ ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒  ▒▒▒▒▒▒   ▒▒▒▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒  ▒▒▒▒▒▒▒▒   ▒▒▒▒▒███ 
-                                                                                 ███ ▒███ 
-                                                                                ▒▒██████  
-                                                                                 ▒▒▒▒▒▒   `
-var Logo2 = "##########"
-
 func main() {
+	menu()
+}
+func menu() {
 	fmt.Println(Logo)
-	_ = download_player_skin()
-
-	fmt.Println("按回车键退出...")
-	fmt.Scanln()
+	fmt.Println("###########################################################################################")
+	fmt.Println("#####################################我的世界皮肤工具#########################################")
+	fmt.Println("###########################################################################################")
+	fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.下载皮肤")
+	fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "2.修改皮肤")
+	fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "3.退出")
+	fmt.Print("请选择序号:")
+	var choice int
+	fmt.Scan(&choice)
+	for {
+		switch choice {
+		case 1:
+			err := download_player_skin()
+			if err != nil {
+				fmt.Println("按回车键退出...")
+				fmt.Scanln()
+				os.Exit(0)
+			} else {
+				continue
+			}
+		case 2:
+			modify_skin()
+			return
+		case 3:
+			fmt.Println("退出")
+			os.Exit(0)
+		}
+	}
 }
 
 func download_player_skin() error {
-	fmt.Println(Logo2 + "输入玩家名称" + Logo2)
+	fmt.Println(Logo2 + Logo3 + "输入玩家名称" + Logo3 + Logo2)
 	var Name string
 	fmt.Scanln(&Name)
 	uuid, err := getid(Name)
@@ -70,6 +83,10 @@ func getid(name_in string) (string, error) {
 		return "", err
 	}
 	defer json_idname.Body.Close()
+	if json_idname.StatusCode == 404 {
+		fmt.Println("未找到玩家")
+		return "", errors.New("未找到玩家")
+	}
 	fmt.Println(fmt.Sprintf("请求成功%d", json_idname.StatusCode))
 	fmt.Println(fmt.Sprintf("请求地址%v", json_idname.Request.URL))
 	//fmt.Println(json_idname.StatusCode)
