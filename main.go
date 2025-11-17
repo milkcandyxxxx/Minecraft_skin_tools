@@ -10,7 +10,23 @@ import (
 	//"os"
 )
 
+// package main
+// 我的皮肤loge
+var Logo = `                  ███  ████  █████                                        █████           
+                 ▒▒▒  ▒▒███ ▒▒███                                        ▒▒███            
+ █████████████   ████  ▒███  ▒███ █████  ██████   ██████   ████████    ███████  █████ ████
+▒▒███▒▒███▒▒███ ▒▒███  ▒███  ▒███▒▒███  ███▒▒███ ▒▒▒▒▒███ ▒▒███▒▒███  ███▒▒███ ▒▒███ ▒███ 
+ ▒███ ▒███ ▒███  ▒███  ▒███  ▒██████▒  ▒███ ▒▒▒   ███████  ▒███ ▒███ ▒███ ▒███  ▒███ ▒███ 
+ ▒███ ▒███ ▒███  ▒███  ▒███  ▒███▒▒███ ▒███  ███ ███▒▒███  ▒███ ▒███ ▒███ ▒███  ▒███ ▒███ 
+ █████▒███ █████ █████ █████ ████ █████▒▒██████ ▒▒████████ ████ █████▒▒████████ ▒▒███████ 
+▒▒▒▒▒ ▒▒▒ ▒▒▒▒▒ ▒▒▒▒▒ ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒  ▒▒▒▒▒▒   ▒▒▒▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒  ▒▒▒▒▒▒▒▒   ▒▒▒▒▒███ 
+                                                                                 ███ ▒███ 
+                                                                                ▒▒██████  
+                                                                                 ▒▒▒▒▒▒   `
+var Logo2 = "##########"
+
 func main() {
+	fmt.Println(Logo)
 	_ = download_player_skin()
 
 	fmt.Println("按回车键退出...")
@@ -18,7 +34,7 @@ func main() {
 }
 
 func download_player_skin() error {
-	fmt.Println("输入玩家名称")
+	fmt.Println(Logo2 + "输入玩家名称" + Logo2)
 	var Name string
 	fmt.Scanln(&Name)
 	uuid, err := getid(Name)
@@ -39,6 +55,13 @@ func download_player_skin() error {
 	return nil
 }
 
+/*
+我的世界官方基于的api不能直接通过名字获取皮肤url
+要先通过https://api.mojang.com/users/profiles/minecraft/获取uuid
+再通过uuid获取用户信息https://sessionserver.mojang.com/session/minecraft/profile/
+返还的为皮肤url的base64编码
+*/
+//获取uuid的函数
 func getid(name_in string) (string, error) {
 	var name string = name_in
 	//fmt.Scan(&Name)
@@ -68,6 +91,7 @@ func getid(name_in string) (string, error) {
 	return idnane.Id, nil
 }
 
+// 获取value（value存储的就是皮肤数据）的函数
 func getvalue(uuid string) string {
 	json_value, err := http.Get(fmt.Sprintf("https://sessionserver.mojang.com/session/minecraft/profile/%s", uuid))
 	if err != nil {
@@ -93,6 +117,8 @@ func getvalue(uuid string) string {
 	fmt.Println(value.Properties[0].Value)
 	return value.Properties[0].Value
 }
+
+// 解码皮肤数据
 func geturl(value string) string {
 	type url_json struct {
 		Timestamp   int64  `json:"timestamp"`
@@ -115,6 +141,8 @@ func geturl(value string) string {
 	}
 	return url.Textures.SKIN.Url
 }
+
+// 下载皮肤
 func downlond(url string, file_name string) error {
 	file_re, err := http.Get(url)
 	if err != nil {
