@@ -11,26 +11,40 @@ import (
 )
 
 func main() {
+	_ = download_player_skin()
+
+	fmt.Println("按回车键退出...")
+	fmt.Scanln()
+}
+
+func download_player_skin() error {
 	fmt.Println("输入玩家名称")
 	var Name string
-	fmt.Scan(&Name)
-	uuid := getid(Name)
+	fmt.Scanln(&Name)
+	uuid, err := getid(Name)
+	if err != nil {
+		fmt.Printf("无法获取 UUID: %s\n", err)
+		return err
+	}
 	value := getvalue(uuid)
 	url := geturl(value)
-	if downlond(url, Name) == true {
+	err = downlond(url, Name)
+	if err == nil {
 		fmt.Println("下载成功")
 	} else {
 		fmt.Println("下载失败")
+		return err
 	}
 
+	return nil
 }
 
-func getid(name_in string) string {
+func getid(name_in string) (string, error) {
 	var name string = name_in
 	//fmt.Scan(&Name)
 	json_idname, err := http.Get(fmt.Sprintf("https://api.mojang.com/users/profiles/minecraft/%s", name))
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 	defer json_idname.Body.Close()
 	fmt.Println(fmt.Sprintf("请求成功%d", json_idname.StatusCode))
@@ -51,7 +65,7 @@ func getid(name_in string) string {
 	}
 	fmt.Println(fmt.Sprintf("uuid %s", idnane.Id))
 	fmt.Println(fmt.Sprintf("name %s", idnane.Name))
-	return idnane.Id
+	return idnane.Id, nil
 }
 
 func getvalue(uuid string) string {
@@ -101,7 +115,7 @@ func geturl(value string) string {
 	}
 	return url.Textures.SKIN.Url
 }
-func downlond(url string, file_name string) bool {
+func downlond(url string, file_name string) error {
 	file_re, err := http.Get(url)
 	if err != nil {
 		fmt.Println(err)
@@ -116,7 +130,7 @@ func downlond(url string, file_name string) bool {
 	err = os.WriteFile(file_path, file_by, 0644)
 	if err != nil {
 		fmt.Println(err)
-		return false
+		return err
 	}
-	return true
+	return nil
 }
