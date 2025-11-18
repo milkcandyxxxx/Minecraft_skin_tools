@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	//"os"
+	// "os"
 )
 
 func main() {
@@ -24,20 +24,20 @@ func menu() {
 	fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "3.退出")
 	fmt.Print("请选择序号:")
 	var choice int
-	fmt.Scan(&choice)
+	_, _ = fmt.Scan(&choice)
 	for {
 		switch choice {
 		case 1:
 			err := download_player_skin()
-			if err != nil {
+			if err == nil {
 				fmt.Println("按回车键退出...")
-				fmt.Scanln()
+				_, _ = fmt.Scanln()
 				os.Exit(0)
 			} else {
 				continue
 			}
 		case 2:
-			modify_skin()
+			_ = modify_skin()
 			return
 		case 3:
 			fmt.Println("退出")
@@ -49,7 +49,7 @@ func menu() {
 func download_player_skin() error {
 	fmt.Println(Logo2 + Logo3 + "输入玩家名称" + Logo3 + Logo2)
 	var Name string
-	fmt.Scanln(&Name)
+	_, _ = fmt.Scanln(&Name)
 	uuid, err := getid(Name)
 	if err != nil {
 		fmt.Printf("无法获取 UUID: %s\n", err)
@@ -74,25 +74,27 @@ func download_player_skin() error {
 再通过uuid获取用户信息https://sessionserver.mojang.com/session/minecraft/profile/
 返还的为皮肤url的base64编码
 */
-//获取uuid的函数
+// 获取uuid的函数
 func getid(name_in string) (string, error) {
-	var name string = name_in
-	//fmt.Scan(&Name)
+	var name = name_in
+	// fmt.Scan(&Name)
 	json_idname, err := http.Get(fmt.Sprintf("https://api.mojang.com/users/profiles/minecraft/%s", name))
 	if err != nil {
 		return "", err
 	}
-	defer json_idname.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(json_idname.Body)
 	if json_idname.StatusCode == 404 {
 		fmt.Println("未找到玩家")
 		return "", errors.New("未找到玩家")
 	}
 	fmt.Println(fmt.Sprintf("请求成功%d", json_idname.StatusCode))
 	fmt.Println(fmt.Sprintf("请求地址%v", json_idname.Request.URL))
-	//fmt.Println(json_idname.StatusCode)
-	//fmt.Println(json_idname)
+	// fmt.Println(json_idname.StatusCode)
+	// fmt.Println(json_idname)
 	body, _ := io.ReadAll(json_idname.Body)
-	//fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	type id_json struct {
 		Id   string `json_idname:"Id"`
@@ -114,7 +116,9 @@ func getvalue(uuid string) string {
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer json_value.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(json_value.Body)
 	body, _ := io.ReadAll(json_value.Body)
 	type value_json struct {
 		Id         string `json:"id"`
@@ -165,7 +169,9 @@ func downlond(url string, file_name string) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer file_re.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(file_re.Body)
 	file_by, err := io.ReadAll(file_re.Body)
 	if err != nil {
 		fmt.Println(err)

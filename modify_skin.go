@@ -16,8 +16,10 @@ func generates_picture(file_name string, newfile *image.RGBA) error {
 		fmt.Println("创建图片失败")
 		return err
 	}
-	defer outfile.Close()
-	png.Encode(outfile, newfile)
+	defer func(outfile *os.File) {
+		_ = outfile.Close()
+	}(outfile)
+	_ = png.Encode(outfile, newfile)
 	return nil
 }
 
@@ -45,22 +47,22 @@ func openfile(file_name string) (image.Image, error, *image.RGBA) {
 		return nil, errors.New("这不是一个我的世界皮肤文件哦"), nil
 	}
 	newfile := image.NewRGBA(image.Rect(0, 0, 64, 64))
-	//defer photo_file.Close()
-	//解码图片
+	// defer photo_file.Close()
+	// 解码图片
 	return decode_file, nil, newfile
 }
 
 // 根据出入值进行修改像素
 func exchange(decode_file image.Image, x_old int, y_old int, x_new int, y_new int, xy int, file_name string, newfile *image.RGBA) (error, *image.RGBA) {
 
-	//复制一份图片的rgb便有修改
+	// 复制一份图片的rgb便有修改
 
 	for x := 0; x < 64; x++ {
 		for y := 0; y < 64; y++ {
 			newfile.Set(x, y, decode_file.At(x, y))
 		}
 	}
-	//创建数组存储rgb数据[x][y][r,g,b,a]
+	// 创建数组存储rgb数据[x][y][r,g,b,a]
 
 	var file_temp [8][8][4]uint8
 	for x := 0; x < xy; x++ {
@@ -103,9 +105,12 @@ func modify_skin() error {
 	for {
 		switch choice {
 		case 1:
-			fmt.Print("输入文件的完整名字，且需要在当前目录（例xmilkcandy.pnf）")
+			fmt.Print("输入文件的完整名字，且需要在当前目录（例xmilkcandy.png）")
 			var file_name string
 			fmt.Scanln(&file_name)
+			fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.头翻转")
+			fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.身体翻转")
+			fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.手和腿替换")
 			fmt.Print("输入序号:")
 			fmt.Scanln(&choice_2)
 			switch choice_2 {
