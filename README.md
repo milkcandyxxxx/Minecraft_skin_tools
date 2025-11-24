@@ -1,1 +1,1 @@
-![演示图片](D:\Programme\Code\go\Minecraft_skin_download\README.assets\演示图片.png)
+![演示图片](README.assets/演示图片-1763985890989-1.png)
