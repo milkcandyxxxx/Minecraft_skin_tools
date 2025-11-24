@@ -97,8 +97,8 @@ func getid(name_in string) (string, error) {
 	// fmt.Println(string(body))
 
 	type id_json struct {
-		Id   string `json_idname:"Id"`
-		Name string `json_idname:"Name"`
+		Id   string `json:"id"`
+		Name string `json:"Name"`
 	}
 	var idnane id_json
 	err = json.Unmarshal(body, &idnane)

@@ -109,8 +109,6 @@ func modify_skin() error {
 			var file_name string
 			fmt.Scanln(&file_name)
 			fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.头翻转")
-			fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.身体翻转")
-			fmt.Printf(Logo2+Logo3+"%-30s"+Logo3+Logo2+"\n", "1.手和腿替换")
 			fmt.Print("输入序号:")
 			fmt.Scanln(&choice_2)
 			switch choice_2 {
@@ -123,9 +121,30 @@ func modify_skin() error {
 				} else {
 					continue
 				}
+
 			}
 
 		case 2:
+			fmt.Print("输入文件的完整名字，且需要在当前目录（例xmilkcandy.png）")
+			var file_name string
+			fmt.Scanln(&file_name)
+			fmt.Println("请仔细查看使用说明哦")
+			fmt.Println("我的世界的皮肤为64*64像素，最小的组件为4*4的像素(不过大部分的组件都为8*8或者8*4)，根据分类不同这里把皮肤分成8*8个方块和4*4的方块（像素数），然后再根据坐标进行计算（按照像素数的不同坐标也不同，请查看附件说明）")
+			var xy [5]int
+			fmt.Println("输入坐标1(x y,空格隔开)")
+			fmt.Scanln(&xy[0], &xy[1])
+			fmt.Println("输入坐标2(x y,空格隔开)")
+			fmt.Scanln(&xy[2], &xy[3])
+			fmt.Println("输入像素数")
+			fmt.Scanln(&xy[4])
+			err := custom(file_name, xy[0], xy[1], xy[2], xy[3], xy[4])
+			if err == nil {
+				fmt.Println("按回车键退出...")
+				fmt.Scanln()
+				os.Exit(0)
+			} else {
+				continue
+			}
 		case 3:
 			fmt.Println("退出")
 			os.Exit(0)
@@ -146,6 +165,16 @@ func change_heads(file_name string) error {
 	if err != nil {
 
 		return err
+	}
+	generates_picture(file_name, newfile)
+	return nil
+}
+
+func custom(file_name string, x_old int, y_old int, x_new int, y_new int, xy int) error {
+	decode_file, _, newfile := openfile(file_name)
+	err, newfile := exchange(decode_file, x_old, y_old, x_new, y_new, xy, file_name, newfile)
+	if err != nil {
+		fmt.Println(err)
 	}
 	generates_picture(file_name, newfile)
 	return nil
